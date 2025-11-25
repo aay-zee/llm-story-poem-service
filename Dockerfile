@@ -11,4 +11,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Use shell form so the container will respect the runtime $PORT value if provided by the platform.
+# Cloud Run provides PORT env; default to 8080 when not set.
+ENTRYPOINT ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
