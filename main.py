@@ -3,9 +3,17 @@ from pydantic import BaseModel
 from model_loader import load_model
 from generator import generate_text
 
-print("Loading Model...")
-tokenizer, model, model_name = load_model()
-print(f"Model Loaded: {model_name}")
+
+tokenizer = None
+model = None
+model_name = None
+
+@app.on_event("startup")
+def startup_event():
+  global tokenizer, model, model_name
+  print("Loading Model...")
+  tokenizer, model, model_name = load_model()
+  print(f"Model Loaded: {model_name}")
 
 app=FastAPI(title="AI Story/Poem Generator API")
 
