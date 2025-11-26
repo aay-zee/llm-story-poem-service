@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-def load_model(preferred="gpt2-medium",fallback="gpt2"):
+def load_model(preferred="gpt2",fallback="gpt2"):
   device="cuda" if torch.cuda.is_available() else "cpu"
   print(f"Loading model: {preferred} on {device}")
   try:
