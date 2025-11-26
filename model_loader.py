@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-def load_model(preferred="gpt2",fallback="gpt2"):
+def load_model(preferred="gpt2-medium",fallback="gpt2"):
   device="cuda" if torch.cuda.is_available() else "cpu"
   print(f"Loading model: {preferred} on {device}")
   try:
@@ -10,7 +10,13 @@ def load_model(preferred="gpt2",fallback="gpt2"):
     if(tokenizer.pad_token is None):
       tokenizer.pad_token = tokenizer.eos_token
       
-    model=AutoModelForCausalLM.from_pretrained(preferred, device_map="auto",torch_dtype=torch.float16 if device == "cuda" else torch.float32,low_cpu_mem_usage=True,trust_remote_code=True)
+    if device == "cuda":
+        model=AutoModelForCausalLM.from_pretrained(preferred, device_map="auto",torch_dtype=torch.float16,low_cpu_mem_usage=True,trust_remote_code=True)
+    else:
+        # On CPU, avoid device_map="auto" and low_cpu_mem_usage as they can cause overhead or OOM on small instances
+        model=AutoModelForCausalLM.from_pretrained(preferred, torch_dtype=torch.float32, trust_remote_code=True)
+        model.to(device)
+
     model.eval()
     return tokenizer, model,preferred
   except Exception as e:
@@ -22,7 +28,12 @@ def load_model(preferred="gpt2",fallback="gpt2"):
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(fallback)
-    model.to(device)
+    # Fallback loading
+    if device == "cuda":
+        model = AutoModelForCausalLM.from_pretrained(fallback, device_map="auto", torch_dtype=torch.float16)
+    else:
+        model = AutoModelForCausalLM.from_pretrained(fallback)
+        model.to(device)
+        
     model.eval()
     return tokenizer, model, fallback
