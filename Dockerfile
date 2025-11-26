@@ -9,6 +9,13 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
+# Set Hugging Face cache directory
+ENV HF_HOME=/app/model_cache
+
+# Download models during build
+COPY download_models.py .
+RUN python download_models.py
+
 COPY . .
 
 # Use shell form so the container will respect the runtime $PORT value if provided by the platform.
