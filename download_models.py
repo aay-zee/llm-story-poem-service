@@ -1,19 +1,16 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import os
+from ctransformers import AutoModelForCausalLM
 
 def download_models():
-    models = ["gpt2-medium", "gpt2"]
+    model_repo = "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
+    model_file = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
     
-    for model_name in models:
-        print(f"Downloading {model_name}...")
-        # Download tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token
-            
-        # Download model
-        model = AutoModelForCausalLM.from_pretrained(model_name)
-        print(f"Successfully downloaded {model_name}")
+    print(f"Downloading {model_repo} ({model_file})...")
+    try:
+        # ctransformers will download to the cache directory automatically
+        model = AutoModelForCausalLM.from_pretrained(model_repo, model_file=model_file)
+        print(f"Successfully downloaded {model_repo}")
+    except Exception as e:
+        print(f"Error downloading model: {e}")
 
 if __name__ == "__main__":
     download_models()

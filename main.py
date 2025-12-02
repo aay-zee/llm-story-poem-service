@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi import Response, status
+from fastapi.middleware.cors import CORSMiddleware
 import threading
 from pydantic import BaseModel
 from model_loader import load_model
@@ -8,6 +9,14 @@ from generator import generate_text
 
 # Create the FastAPI app before registering events or routes
 app = FastAPI(title="AI Story/Poem Generator API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 tokenizer = None
 model = None
